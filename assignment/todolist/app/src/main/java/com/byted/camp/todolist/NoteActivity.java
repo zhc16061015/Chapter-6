@@ -1,8 +1,11 @@
 package com.byted.camp.todolist;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -11,10 +14,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.byted.camp.todolist.MainActivity;
+import com.byted.camp.todolist.db.TodoContract;
+import com.byted.camp.todolist.db.TodoDbHelper;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class NoteActivity extends AppCompatActivity {
 
     private EditText editText;
     private Button addBtn;
+    TodoDbHelper mDbHelper = new TodoDbHelper(NoteActivity.this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +74,24 @@ public class NoteActivity extends AppCompatActivity {
 
     private boolean saveNote2Database(String content) {
         // TODO 插入一条新数据，返回是否插入成功
-        return false;
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        Date date = new Date();
+        long times = date.getTime();
+
+        values.put(TodoContract.FeedEntry.COLUMN_NAME_DATE,times);
+        values.put(TodoContract.FeedEntry.COLUMN_NAME_STATE,"0");
+        values.put(TodoContract.FeedEntry.COLUMN_NAME_CONTENT,content);
+
+        try{
+            long newRowId = db.insert(TodoContract.FeedEntry.TABLE_NAME,null,values);
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }finally {
+
+        }
     }
 }
